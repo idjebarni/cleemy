@@ -4,10 +4,11 @@ import { Expense } from './models/expense.model';
 import { TableColumn } from './models/table-column.model';
 import { ExpenseFormModalComponent } from './components/expense-form/expense-form-modal.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { ExpenseActions } from './store/expense.actions';
 import { ExpenseState } from './store/expense.state';
+import { NzModalRef } from 'ng-zorro-antd/modal/modal-ref';
 
 @Component({
   selector: 'cleemy-expense-list',
@@ -27,12 +28,13 @@ export class ExpenseListComponent implements OnInit, OnDestroy {
     {
       name: 'Purchased date',
       sortOrder: null,
-      sortFn: null,
+      sortFn: (a: Expense, b: Expense) =>
+        new Date(a.purchasedOn).getTime() > new Date(b.purchasedOn).getTime() ? -1 : 1,
     },
     {
       name: 'Nature',
       sortOrder: null,
-      sortFn: null,
+      sortFn: (a: Expense, b: Expense) => a.nature.localeCompare(b.nature),
     },
     {
       name: 'Original amount',
@@ -47,17 +49,18 @@ export class ExpenseListComponent implements OnInit, OnDestroy {
     {
       name: 'Comment',
       sortOrder: null,
-      sortFn: null,
+      sortFn: (a: Expense, b: Expense) => a.comment.localeCompare(b.comment),
     },
     {
       name: 'Created date',
       sortOrder: null,
-      sortFn: null,
+      sortFn: (a: Expense, b: Expense) => (new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime() ? -1 : 1),
     },
     {
       name: 'Last modification date',
       sortOrder: null,
-      sortFn: null,
+      sortFn: (a: Expense, b: Expense) =>
+        new Date(a.lastModifiedAt).getTime() > new Date(b.lastModifiedAt).getTime() ? -1 : 1,
     },
     {
       name: 'Action',
@@ -90,6 +93,25 @@ export class ExpenseListComponent implements OnInit, OnDestroy {
   }
 
   addExpense() {
+    const modalRef = this.openExpenseModal();
+
+    modalRef.componentInstance?.onConfirm.pipe(takeUntil(this.destroy$)).subscribe((expense: Expense) => {
+      this.store.dispatch(new ExpenseActions.CreateExpense(expense));
+    });
+  }
+
+  deleteRow(id: string): void {
+    this.store.dispatch(new ExpenseActions.DeleteExpense(id));
+  }
+
+  updateRow(expense: Partial<Expense>): void {
+    const modalRef = this.openExpenseModal(expense);
+    modalRef.componentInstance?.onConfirm.pipe(takeUntil(this.destroy$)).subscribe((expense: Expense) => {
+      this.store.dispatch(new ExpenseActions.UpdateExpense(expense));
+    });
+  }
+
+  private openExpenseModal(editedExpense?: Partial<Expense>): NzModalRef {
     const modalRef = this.modal.create({
       nzTitle: 'Add expense',
       nzContent: ExpenseFormModalComponent,
@@ -102,19 +124,23 @@ export class ExpenseListComponent implements OnInit, OnDestroy {
           },
         },
         {
-          label: 'Add',
+          label: editedExpense ? 'Edit' : 'Create',
           type: 'primary',
           onClick: () => {
-            modalRef.componentInstance?.submitForm();
+            modalRef.componentInstance?.submitForm().then((success) => {
+              if (success) modalRef.close();
+            });
           },
         },
       ],
       nzMaskClosable: false,
       nzClosable: false,
     });
-  }
 
-  deleteRow(id: string): void {
-    console.log(id);
+    if (editedExpense) {
+      modalRef?.componentInstance?.init(editedExpense as Partial<Expense>);
+    }
+
+    return modalRef;
   }
 }

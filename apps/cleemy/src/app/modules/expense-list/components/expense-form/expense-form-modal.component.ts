@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { NzModalRef } from 'ng-zorro-antd/modal';
+import Currencies from '../../../shared/utils/currencies.json';
+import { Expense } from '../../models/expense.model';
 
 @Component({
   selector: 'cleemy-expense-form-modal',
@@ -9,46 +11,60 @@ import { NzModalRef } from 'ng-zorro-antd/modal';
 })
 export class ExpenseFormModalComponent implements OnInit {
   validateForm!: UntypedFormGroup;
+  currencies: any = Object.keys(Currencies);
+  editedExpense: Partial<Expense> | undefined;
+
+  @Output() onConfirm: EventEmitter<Partial<Expense>> = new EventEmitter<Partial<Expense>>();
 
   constructor(private fb: UntypedFormBuilder, public modal: NzModalRef) {}
 
-  submitForm(): void {
-    if (this.validateForm.valid) {
-      console.log('submit', this.validateForm.value);
-    } else {
-      Object.values(this.validateForm.controls).forEach((control) => {
-        if (control.invalid) {
-          control.markAsDirty();
-          control.updateValueAndValidity({ onlySelf: true });
-        }
-      });
-    }
+  submitForm(): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      if (this.validateForm.valid) {
+        const expense = {
+          ...(this.editedExpense ?? null),
+          purchasedOn: this.validateForm.value.purchasedOn,
+          nature: this.validateForm.value.nature,
+          comment: this.validateForm.value.comment,
+          originalAmount: {
+            amount: this.validateForm.value.originalAmount,
+            currency: this.validateForm.value.originalCurrency,
+          },
+          convertedAmount: {
+            amount: this.validateForm.value.convertedAmount,
+            currency: this.validateForm.value.conversionCurrency,
+          },
+        };
+
+        this.onConfirm.emit(expense);
+
+        resolve(true);
+      } else {
+        Object.values(this.validateForm.controls).forEach((control) => {
+          if (control.invalid) {
+            control.markAsDirty();
+            control.updateValueAndValidity({ onlySelf: true });
+          }
+        });
+
+        reject(false);
+      }
+    });
   }
 
-  updateConfirmValidator(): void {
-    /** wait for refresh value */
-    Promise.resolve().then(() => this.validateForm.controls['checkPassword'].updateValueAndValidity());
+  init(editedExpense: Partial<Expense>) {
+    this.editedExpense = editedExpense;
   }
-
-  confirmationValidator = (control: UntypedFormControl): { [s: string]: boolean } => {
-    if (!control.value) {
-      return { required: true };
-    } else if (control.value !== this.validateForm.controls['password'].value) {
-      return { confirm: true, error: true };
-    }
-    return {};
-  };
 
   ngOnInit(): void {
     this.validateForm = this.fb.group({
-      email: [null, [Validators.email, Validators.required]],
-      password: [null, [Validators.required]],
-      checkPassword: [null, [Validators.required, this.confirmationValidator]],
-      nickname: [null, [Validators.required]],
-      phoneNumberPrefix: ['+86'],
-      phoneNumber: [null, [Validators.required]],
-      website: [null, [Validators.required]],
-      agree: [false],
+      purchasedOn: [this.editedExpense?.purchasedOn ?? null, [Validators.required]],
+      nature: [this.editedExpense?.nature ?? null, [Validators.required]],
+      comment: [this.editedExpense?.comment ?? null, [Validators.required]],
+      originalAmount: [this.editedExpense?.originalAmount?.amount ?? null, [Validators.required]],
+      originalCurrency: [this.editedExpense?.originalAmount?.currency ?? 'USD', [Validators.required]],
+      convertedAmount: [this.editedExpense?.convertedAmount?.amount ?? null, [Validators.required]],
+      conversionCurrency: [this.editedExpense?.convertedAmount?.currency ?? 'EUR', [Validators.required]],
     });
   }
 }

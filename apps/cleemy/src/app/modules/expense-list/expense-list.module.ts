@@ -9,12 +9,14 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { ExpenseFormModalComponent } from './components/expense-form/expense-form-modal.component';
 import { NzFormModule } from 'ng-zorro-antd/form';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 
 @NgModule({
   declarations: [ExpenseListComponent, ExpenseFormModalComponent],
@@ -32,6 +34,9 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
     NzModalModule,
     NzPopconfirmModule,
     NzIconModule,
+    NzDatePickerModule,
+    FormsModule,
+    NzInputNumberModule,
   ],
   providers: [ExpenseService],
 })

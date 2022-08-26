@@ -1,71 +1,63 @@
-<form (ngSubmit)='submitForm()' [formGroup]='validateForm' nz-form>
+<form (ngSubmit)='submitForm()' [formGroup]='validateForm' nz-form nzLayout='vertical'>
   <nz-form-item>
-    <nz-form-label [nzSm]='6' [nzXs]='24' nzFor='email' nzRequired>E-mail</nz-form-label>
-    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='The input is not valid E-mail!'>
-      <input formControlName='email' id='email' nz-input />
-    </nz-form-control>
-  </nz-form-item>
-  <nz-form-item>
-    <nz-form-label [nzSm]='6' [nzXs]='24' nzFor='password' nzRequired>Password</nz-form-label>
-    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please input your password!'>
-      <input
-        (ngModelChange)='updateConfirmValidator()'
-        formControlName='password'
-        id='password'
-        nz-input
-        type='password'
-      />
-    </nz-form-control>
-  </nz-form-item>
-  <nz-form-item>
-    <nz-form-label [nzSm]='6' [nzXs]='24' nzFor='checkPassword' nzRequired>Confirm Password</nz-form-label>
-    <nz-form-control [nzErrorTip]='errorTpl' [nzSm]='14' [nzXs]='24'>
-      <input formControlName='checkPassword' id='checkPassword' nz-input type='password' />
-      <ng-template #errorTpl let-control>
-        <ng-container *ngIf="control.hasError('required')">Please confirm your password!</ng-container>
-        <ng-container *ngIf="control.hasError('confirm')">
-          Two passwords that you enter is inconsistent!
-        </ng-container>
-      </ng-template>
+    <nz-form-label [nzSm]='6' [nzXs]='24' nzFor='purchasedOn' nzRequired>Purchase date</nz-form-label>
+    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='You should choose a date'>
+      <nz-date-picker formControlName='purchasedOn'></nz-date-picker>
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
     <nz-form-label
       [nzSm]='6'
       [nzXs]='24'
-      nzFor='nickname'
+      nzFor='nature'
       nzRequired
-      nzTooltipTitle='What do you want other to call you'
+      nzTooltipTitle='What was the purpose of the expense'
     >
-      <span>Nickname</span>
+      <span>Nature</span>
     </nz-form-label>
-    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please input your nickname!'>
-      <input formControlName='nickname' id='nickname' nz-input />
+    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please fill the purpose of the expense'>
+      <input formControlName='nature' id='nature' nz-input placeholder='Restaurant, parking...' />
+    </nz-form-control>
+  </nz-form-item>
+
+  <nz-form-item>
+    <nz-form-label
+      [nzSm]='6'
+      [nzXs]='24'
+      nzFor='comment'
+      nzRequired
+      nzTooltipTitle='Explain the nature of your expense'
+    >
+      <span>Comment</span>
+    </nz-form-label>
+    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please add a comment to explain'>
+      <textarea formControlName='comment' id='comment'></textarea>
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
-    <nz-form-label [nzSm]='6' [nzXs]='24' nzFor='phoneNumber' nzRequired>Phone Number</nz-form-label>
-    <nz-form-control
-      [nzSm]='14'
-      [nzValidateStatus]="validateForm.controls['phoneNumber']"
-      [nzXs]='24'
-      nzErrorTip='Please input your phone number!'
-    >
-      <nz-input-group [nzAddOnBefore]='addOnBeforeTemplate'>
-        <ng-template #addOnBeforeTemplate>
-          <nz-select class='phone-select' formControlName='phoneNumberPrefix'>
-            <nz-option nzLabel='+86' nzValue='+86'></nz-option>
-            <nz-option nzLabel='+87' nzValue='+87'></nz-option>
+    <nz-form-label [nzSm]='14' [nzXs]='24' nzFor='originalAmount' nzRequired>Original amount</nz-form-label>
+    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please insert your expense'>
+      <nz-input-group [nzAddOnBefore]='originalCurrencyTemplate'>
+        <ng-template #originalCurrencyTemplate>
+          <nz-select formControlName='originalCurrency' nzShowSearch>
+            <nz-option *ngFor='let currency of currencies' [nzLabel]='currency' [nzValue]='currency'></nz-option>
           </nz-select>
         </ng-template>
-        <input formControlName='phoneNumber' id="'phoneNumber'" nz-input />
+        <nz-input-number [nzMax]='100000' [nzMin]='1' [nzStep]='1' formControlName='originalAmount'></nz-input-number>
       </nz-input-group>
     </nz-form-control>
   </nz-form-item>
   <nz-form-item>
-    <nz-form-label [nzSm]='6' [nzXs]='24' nzFor='website' nzRequired>Website</nz-form-label>
-    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please input website!'>
-      <input formControlName='website' id='website' nz-input placeholder='website' />
+    <nz-form-label [nzSm]='14' [nzXs]='24' nzFor='convertedAmount' nzRequired>Converted amount</nz-form-label>
+    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please insert your converted expense'>
+      <nz-input-group [nzAddOnBefore]='conversionCurrencyTemplate'>
+        <ng-template #conversionCurrencyTemplate>
+          <nz-select formControlName='conversionCurrency' nzShowSearch>
+            <nz-option *ngFor='let currency of currencies' [nzLabel]='currency' [nzValue]='currency'></nz-option>
+          </nz-select>
+        </ng-template>
+        <nz-input-number [nzMax]='100000' [nzMin]='1' [nzStep]='1' formControlName='convertedAmount'></nz-input-number>
+      </nz-input-group>
     </nz-form-control>
   </nz-form-item>
 </form>

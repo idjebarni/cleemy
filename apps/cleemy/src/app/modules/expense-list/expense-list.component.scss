@@ -8,4 +8,12 @@
   .table-operations > button {
     margin-right: 8px;
   }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 143px;
+    gap: 8px;
+  }
 }

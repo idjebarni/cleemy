@@ -61,12 +61,42 @@ export class ExpenseState {
     );
   }
 
+  @Action(ExpenseActions.DeleteExpense)
+  public deleteExpense({ dispatch }: StateContext<ExpenseModel>, { id }: ExpenseActions.DeleteExpense) {
+    return this.expenseService.deleteExpense(id).pipe(
+      tap((result) => {
+        console.log(result);
+        return dispatch(new ExpenseActions.LoadExpenses());
+      }),
+    );
+  }
+
+  @Action(ExpenseActions.CreateExpense)
+  createExpense({ dispatch, setState }: StateContext<ExpenseModel>, { expense }: ExpenseActions.CreateExpense) {
+    return this.expenseService.createExpense(expense).pipe(
+      tap((result) => {
+        return dispatch(new ExpenseActions.LoadExpenses());
+      }),
+    );
+  }
+
+  @Action(ExpenseActions.UpdateExpense)
+  updateExpense({ dispatch, setState }: StateContext<ExpenseModel>, { expense }: ExpenseActions.UpdateExpense) {
+    console.log(expense);
+    return this.expenseService.updateExpense(expense).pipe(
+      tap((result) => {
+        console.log(result);
+        return dispatch(new ExpenseActions.LoadExpenses());
+      }),
+    );
+  }
+
   @Action(ExpenseActions.ConvertExpense, { cancelUncompleted: true })
   public convertExpense(
     { setState, getState, dispatch }: StateContext<ExpenseModel>,
     { id }: ExpenseActions.ConvertExpense,
   ) {
-    const currentExpense: any = getState().expenses?.resource?.find((expense) => expense.id === id);
+    const currentExpense: any = getState().expenses?.resource?.find((expense: Expense) => expense.id === id);
     if (currentExpense) {
       this.expenseService
         .convertExpense({

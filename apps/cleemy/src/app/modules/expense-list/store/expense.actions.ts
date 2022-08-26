@@ -1,3 +1,5 @@
+import { Expense } from '../models/expense.model';
+
 export namespace ExpenseActions {
   export class LoadExpenses {
     public static readonly type = '[Expenses] LOAD_EXPENSES';
@@ -12,19 +14,19 @@ export namespace ExpenseActions {
   }
 
   export class CreateExpense {
-    public static readonly type = '[Expenses] ADD_EXPENSE';
+    public static readonly type = '[Expenses] CREATE_EXPENSE';
 
-    constructor(public id: string) {}
+    constructor(public expense: Partial<Expense>) {}
   }
 
-  export class EditExpense {
-    public static readonly type = '[Expenses] EDIT_EXPENSE';
+  export class UpdateExpense {
+    public static readonly type = '[Expenses] UPDATE_EXPENSE';
 
-    constructor(public id: string) {}
+    constructor(public expense: Partial<Expense>) {}
   }
 
-  export class RemoveExpense {
-    public static readonly type = '[Expenses] EDIT_EXPENSE';
+  export class DeleteExpense {
+    public static readonly type = '[Expenses] DELETE_EXPENSE';
 
     constructor(public id: string) {}
   }
