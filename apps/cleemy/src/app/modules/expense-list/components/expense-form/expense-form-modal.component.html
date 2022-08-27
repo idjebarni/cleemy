@@ -16,7 +16,7 @@
       <span>Nature</span>
     </nz-form-label>
     <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please fill the purpose of the expense'>
-      <input formControlName='nature' id='nature' nz-input placeholder='Restaurant, parking...' />
+      <input formControlName='nature' id='nature' maxlength='120' nz-input placeholder='Restaurant, parking...' />
     </nz-form-control>
   </nz-form-item>
 
@@ -30,33 +30,43 @@
     >
       <span>Comment</span>
     </nz-form-label>
-    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please add a comment to explain'>
-      <textarea formControlName='comment' id='comment'></textarea>
+    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please add a comment to explain your expense'>
+      <textarea formControlName='comment' id='comment' maxlength='600' nz-input></textarea>
     </nz-form-control>
   </nz-form-item>
+  <nz-collapse nzAccordion>
+    <nz-collapse-panel [nzActive]='false' [nzHeader]="'You used another currency?'">
+      <nz-form-item>
+        <nz-form-label [nzSm]='14' [nzXs]='24' nzFor='originalAmount'>
+          Expense amount
+        </nz-form-label>
+        <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please insert your expense'>
+          <nz-input-group [nzAddOnBefore]='originalCurrencyTemplate'>
+            <ng-template #originalCurrencyTemplate>
+              <nz-select formControlName='originalCurrency' nzShowSearch>
+                <nz-option *ngFor='let currency of currencies' [nzLabel]='currency' [nzValue]='currency'></nz-option>
+              </nz-select>
+            </ng-template>
+            <nz-input-number #originalAmount [nzMin]='1'
+                             [nzStep]='1' formControlName='originalAmount'></nz-input-number>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <div class='button-container'>
+        <button (click)='convertAmount(originalAmount?.displayValue)' nz-button>Convert</button>
+      </div>
+    </nz-collapse-panel>
+  </nz-collapse>
   <nz-form-item>
-    <nz-form-label [nzSm]='14' [nzXs]='24' nzFor='originalAmount' nzRequired>Original amount</nz-form-label>
-    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please insert your expense'>
-      <nz-input-group [nzAddOnBefore]='originalCurrencyTemplate'>
-        <ng-template #originalCurrencyTemplate>
-          <nz-select formControlName='originalCurrency' nzShowSearch>
-            <nz-option *ngFor='let currency of currencies' [nzLabel]='currency' [nzValue]='currency'></nz-option>
-          </nz-select>
-        </ng-template>
-        <nz-input-number [nzMax]='100000' [nzMin]='1' [nzStep]='1' formControlName='originalAmount'></nz-input-number>
-      </nz-input-group>
-    </nz-form-control>
-  </nz-form-item>
-  <nz-form-item>
-    <nz-form-label [nzSm]='14' [nzXs]='24' nzFor='convertedAmount' nzRequired>Converted amount</nz-form-label>
+    <nz-form-label [nzSm]='14' [nzXs]='24' nzFor='convertedAmount' nzRequired>Expense amount</nz-form-label>
     <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please insert your converted expense'>
       <nz-input-group [nzAddOnBefore]='conversionCurrencyTemplate'>
         <ng-template #conversionCurrencyTemplate>
-          <nz-select formControlName='conversionCurrency' nzShowSearch>
-            <nz-option *ngFor='let currency of currencies' [nzLabel]='currency' [nzValue]='currency'></nz-option>
+          <nz-select [nzDisabled]='true' formControlName='conversionCurrency'>
+            <nz-option [nzLabel]="'EUR'" [nzValue]="'EUR'"></nz-option>
           </nz-select>
         </ng-template>
-        <nz-input-number [nzMax]='100000' [nzMin]='1' [nzStep]='1' formControlName='convertedAmount'></nz-input-number>
+        <nz-input-number [nzMin]='1' [nzStep]='1' formControlName='convertedAmount'></nz-input-number>
       </nz-input-group>
     </nz-form-control>
   </nz-form-item>
