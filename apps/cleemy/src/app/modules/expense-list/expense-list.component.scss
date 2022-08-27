@@ -2,7 +2,16 @@
   padding: 50px;
 
   .table-operations {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     margin-bottom: 16px;
+
+    .expenses-count {
+      margin-left: auto;
+      min-width: 100px;
+      padding-left: 10px;
+    }
   }
 
   .table-operations > button {

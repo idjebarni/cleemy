@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ExpenseListComponent } from './expense-list.component';
-import { ExpenseService } from './service/expense.service';
+import { ExpenseService } from './store/expense.service';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from '../shared/shared.module';
 import { ExpenseListRoutingModule } from './expense-list-routing.module';
@@ -17,6 +17,9 @@ import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { NzPipesModule } from 'ng-zorro-antd/pipes';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 @NgModule({
   declarations: [ExpenseListComponent, ExpenseFormModalComponent],
@@ -37,6 +40,9 @@ import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
     NzDatePickerModule,
     FormsModule,
     NzInputNumberModule,
+    NzCollapseModule,
+    NzPipesModule,
+    NzToolTipModule,
   ],
   providers: [ExpenseService],
 })

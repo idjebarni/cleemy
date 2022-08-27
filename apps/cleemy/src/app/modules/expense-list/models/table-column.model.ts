@@ -5,4 +5,5 @@ export interface TableColumn {
   name: string;
   sortOrder: NzTableSortOrder | null;
   sortFn: NzTableSortFn<Expense> | null;
+  showSort?: boolean;
 }

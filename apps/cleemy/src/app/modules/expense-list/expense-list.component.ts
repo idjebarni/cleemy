@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ExpenseService } from './service/expense.service';
+import { Component, OnDestroy } from '@angular/core';
+import { ExpenseService } from './store/expense.service';
 import { Expense } from './models/expense.model';
 import { TableColumn } from './models/table-column.model';
 import { ExpenseFormModalComponent } from './components/expense-form/expense-form-modal.component';
@@ -15,50 +15,47 @@ import { NzModalRef } from 'ng-zorro-antd/modal/modal-ref';
   templateUrl: './expense-list.component.html',
   styleUrls: ['./expense-list.component.scss'],
 })
-export class ExpenseListComponent implements OnInit, OnDestroy {
+export class ExpenseListComponent implements OnDestroy {
   @Select(ExpenseState.expenses) expenses$: Observable<any> | undefined;
   @Select(ExpenseState.expensesTotal) totalCount$: Observable<any> | undefined;
+  @Select(ExpenseState.loading) loading$: Observable<any> | undefined;
 
   columns: TableColumn[] = [
     {
-      name: 'Id',
-      sortOrder: null,
-      sortFn: (a: Expense, b: Expense) => a.id.localeCompare(b.id),
-    },
-    {
       name: 'Purchased date',
       sortOrder: null,
+      showSort: true,
       sortFn: (a: Expense, b: Expense) =>
         new Date(a.purchasedOn).getTime() > new Date(b.purchasedOn).getTime() ? -1 : 1,
     },
     {
       name: 'Nature',
       sortOrder: null,
+      showSort: true,
       sortFn: (a: Expense, b: Expense) => a.nature.localeCompare(b.nature),
     },
     {
-      name: 'Original amount',
+      name: 'Amount',
       sortOrder: null,
+      showSort: true,
       sortFn: (a: Expense, b: Expense) => a.originalAmount.amount - b.originalAmount.amount,
-    },
-    {
-      name: 'Converted amount',
-      sortOrder: null,
-      sortFn: (a: Expense, b: Expense) => a.convertedAmount.amount - b.convertedAmount.amount,
     },
     {
       name: 'Comment',
       sortOrder: null,
+      showSort: true,
       sortFn: (a: Expense, b: Expense) => a.comment.localeCompare(b.comment),
     },
     {
       name: 'Created date',
       sortOrder: null,
+      showSort: true,
       sortFn: (a: Expense, b: Expense) => (new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime() ? -1 : 1),
     },
     {
       name: 'Last modification date',
       sortOrder: null,
+      showSort: true,
       sortFn: (a: Expense, b: Expense) =>
         new Date(a.lastModifiedAt).getTime() > new Date(b.lastModifiedAt).getTime() ? -1 : 1,
     },
@@ -66,6 +63,7 @@ export class ExpenseListComponent implements OnInit, OnDestroy {
       name: 'Action',
       sortOrder: null,
       sortFn: null,
+      showSort: false,
     },
   ];
   destroy$ = new Subject();
@@ -74,8 +72,6 @@ export class ExpenseListComponent implements OnInit, OnDestroy {
   constructor(private expenseService: ExpenseService, private modal: NzModalService, private store: Store) {
     this.store.dispatch(new ExpenseActions.LoadExpenses());
   }
-
-  ngOnInit(): void {}
 
   ngOnDestroy() {
     this.destroy$.next(true);
@@ -94,7 +90,6 @@ export class ExpenseListComponent implements OnInit, OnDestroy {
 
   addExpense() {
     const modalRef = this.openExpenseModal();
-
     modalRef.componentInstance?.onConfirm.pipe(takeUntil(this.destroy$)).subscribe((expense: Expense) => {
       this.store.dispatch(new ExpenseActions.CreateExpense(expense));
     });
@@ -113,7 +108,7 @@ export class ExpenseListComponent implements OnInit, OnDestroy {
 
   private openExpenseModal(editedExpense?: Partial<Expense>): NzModalRef {
     const modalRef = this.modal.create({
-      nzTitle: 'Add expense',
+      nzTitle: editedExpense ? 'Edit expense' : 'Create expense',
       nzContent: ExpenseFormModalComponent,
       nzFooter: [
         {
@@ -127,9 +122,12 @@ export class ExpenseListComponent implements OnInit, OnDestroy {
           label: editedExpense ? 'Edit' : 'Create',
           type: 'primary',
           onClick: () => {
-            modalRef.componentInstance?.submitForm().then((success) => {
-              if (success) modalRef.close();
-            });
+            modalRef.componentInstance
+              ?.submitForm()
+              .then((success) => {
+                if (success) modalRef.close();
+              })
+              .catch((error) => error);
           },
         },
       ],

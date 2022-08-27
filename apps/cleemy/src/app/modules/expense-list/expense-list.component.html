@@ -2,15 +2,19 @@
   <div class='table-operations'>
     <button (click)='addExpense()' nz-button>Create expense</button>
     <button (click)='resetSortAndFilters()' nz-button>Clear sorters</button>
+    <div class='expenses-count'>
+      <span>{{ (totalCount$ | async) }} expenses</span>
+    </div>
   </div>
-  <nz-table #filterTable [nzData]='(expenses$ | async)' [nzTotal]='(totalCount$ | async)' nzTableLayout='fixed'>
+  <nz-table #filterTable [nzData]='(expenses$ | async)' [nzLoading]='(loading$ | async)'
+            [nzPageSize]='5' [nzTotal]='(totalCount$ | async)' nzTableLayout='fixed'>
     <thead>
     <tr>
       <th
         *ngFor='let column of columns; trackBy: trackByName'
         [(nzSortOrder)]='column.sortOrder'
+        [nzShowSort]='column.showSort'
         [nzSortFn]='column.sortFn'
-
       >
         {{ column.name }}
       </th>
@@ -18,12 +22,20 @@
     </thead>
     <tbody>
     <tr *ngFor='let data of filterTable.data'>
-      <td>{{ data.id }}</td>
       <td>{{ data.purchasedOn | date: 'MMM d, h:mm a' }}</td>
       <td>{{ data.nature }}</td>
-      <td>{{ data.originalAmount.amount | currency: data.originalAmount.currency }}</td>
-      <td>{{ data.convertedAmount.amount | currency: data.convertedAmount.currency }}</td>
-      <td>{{ data.comment }}</td>
+      <td
+        [nzTooltipTitle]="data.originalAmount.amount && data.originalAmount.currency !== 'EUR' ?
+        'Original amount: ' + (data.originalAmount.amount | currency: data.originalAmount.currency : 'symbol' : '1.0-0') : null"
+        nz-tooltip
+        nzTooltipPlacement='bottom'>
+        {{ data.convertedAmount.amount | currency: data.convertedAmount.currency : 'symbol' : '1.0-0' }}
+      </td>
+      <td [nzTooltipTitle]='data.comment.length > 150 ? data.comment : null'
+          nz-tooltip
+          nzTooltipPlacement='bottom'>
+        {{ data.comment | nzEllipsis: 150 }}
+      </td>
       <td>{{ data.createdAt | date: 'MMM d, h:mm a' }}</td>
       <td>{{ data.lastModifiedAt | date: 'MMM d, h:mm a' }}</td>
       <td class='actions'>
