@@ -1,6 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
-@import "~ng-zorro-antd/ng-zorro-antd.min.css";
-/* You can add global styles to this file, and also import other style files */
+@import "~ng-zorro-antd/ng-zorro-antd.dark.css";
 
 html, body {
   height: 100%;
@@ -18,7 +16,7 @@ body {
 }
 
 .ant-table-wrapper {
-  min-width: 845px;
+  min-width: 950px;
 }
 
 .ant-page-header-heading-title {
@@ -31,4 +29,8 @@ body {
 
 .ant-input-number {
   width: 100%;
+}
+
+.ant-collapse-item {
+  margin-bottom: 31px;
 }
