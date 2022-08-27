@@ -1,10 +1,10 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { Expense } from '../models/expense.model';
-import { ExpenseService } from '../service/expense.service';
+import { ExpenseService } from './expense.service';
 import { LoadableResource } from '../../shared/models/loadable-resource';
 import { patch } from '@ngxs/store/operators';
-import { catchError, filter, Subject, takeUntil, tap } from 'rxjs';
+import { catchError, Subject, tap } from 'rxjs';
 import { ExpenseActions } from './expense.actions';
 import { setError, setLoading, setResource } from '../../shared/utils/store-utils';
 
@@ -40,12 +40,12 @@ export class ExpenseState {
   }
 
   @Selector()
-  public static expenses(state: ExpenseModel): Expense[] {
+  public static expenses(state: ExpenseModel): Expense[] | null {
     return state.expenses.resource;
   }
 
   @Selector()
-  public static expensesTotal(state: ExpenseModel): number | undefined {
+  public static expensesTotal(state: ExpenseModel): number | null | undefined {
     return state.expenses.total;
   }
 
@@ -64,72 +64,28 @@ export class ExpenseState {
   @Action(ExpenseActions.DeleteExpense)
   public deleteExpense({ dispatch }: StateContext<ExpenseModel>, { id }: ExpenseActions.DeleteExpense) {
     return this.expenseService.deleteExpense(id).pipe(
-      tap((result) => {
-        console.log(result);
+      tap(() => {
         return dispatch(new ExpenseActions.LoadExpenses());
       }),
     );
   }
 
   @Action(ExpenseActions.CreateExpense)
-  createExpense({ dispatch, setState }: StateContext<ExpenseModel>, { expense }: ExpenseActions.CreateExpense) {
+  createExpense({ dispatch }: StateContext<ExpenseModel>, { expense }: ExpenseActions.CreateExpense) {
     return this.expenseService.createExpense(expense).pipe(
-      tap((result) => {
+      tap(() => {
         return dispatch(new ExpenseActions.LoadExpenses());
       }),
     );
   }
 
   @Action(ExpenseActions.UpdateExpense)
-  updateExpense({ dispatch, setState }: StateContext<ExpenseModel>, { expense }: ExpenseActions.UpdateExpense) {
-    console.log(expense);
+  updateExpense({ dispatch }: StateContext<ExpenseModel>, { expense }: ExpenseActions.UpdateExpense) {
     return this.expenseService.updateExpense(expense).pipe(
-      tap((result) => {
-        console.log(result);
+      tap(() => {
         return dispatch(new ExpenseActions.LoadExpenses());
       }),
     );
-  }
-
-  @Action(ExpenseActions.ConvertExpense, { cancelUncompleted: true })
-  public convertExpense(
-    { setState, getState, dispatch }: StateContext<ExpenseModel>,
-    { id }: ExpenseActions.ConvertExpense,
-  ) {
-    const currentExpense: any = getState().expenses?.resource?.find((expense: Expense) => expense.id === id);
-    if (currentExpense) {
-      this.expenseService
-        .convertExpense({
-          to: 'EUR',
-          from: currentExpense?.originalAmount.currency,
-          amount: currentExpense?.originalAmount.amount,
-        })
-        .pipe(
-          takeUntil(this.destroy$),
-          filter((expenses) => !!expenses),
-        )
-        .subscribe((response) => {
-          if (response.success) {
-            setState(
-              patch({
-                expenses: setResource(
-                  getState().expenses.resource.map((expense: any) => {
-                    if (expense.id === id) {
-                      return {
-                        ...expense,
-                        convertedAmount: {
-                          ...expense.convertedAmount,
-                          amount: response.result,
-                        },
-                      };
-                    }
-                  }),
-                ),
-              }),
-            );
-          }
-        });
-    }
   }
 
   @Action(ExpenseActions.Reset)
