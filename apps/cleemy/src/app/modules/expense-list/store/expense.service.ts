@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { Expense } from '../models/expense.model';
 
 const api = 'http://localhost:3000/api/';
-const apiKey = '1PDFmrpqi57wrzgZ8CAuiEyi0gl0Ncyc';
 
 @Injectable({
   providedIn: 'root',
@@ -44,16 +43,17 @@ export class ExpenseService {
     });
   }
 
-  convertExpense(params: { to: string; from: string; amount: number }) {
+  convertExpense(params: { amount: string | number | undefined; from: string; to: string }) {
     const httpOptions = {
       headers: new HttpHeaders({
-        apiKey: apiKey,
+        /*      apiKey: apiKey,*/
+        'X-RapidAPI-Key': 'ca3f3da909msha9b88fc69c90938p14ae62jsn948a5427f96b',
+        'X-RapidAPI-Host': 'currency-conversion-and-exchange-rates.p.rapidapi.com',
       }),
     };
 
     return this.http.get<any>(
-      `https://api.apilayer.com/currency_data/convert?to=${params?.to}&from=${params?.from}&amount=${params?.amount}`,
-      // @ts-ignore
+      `https://currency-conversion-and-exchange-rates.p.rapidapi.com/convert?from=${params.from}&to=${params.to}&amount=${params.amount}`,
       httpOptions,
     );
   }
