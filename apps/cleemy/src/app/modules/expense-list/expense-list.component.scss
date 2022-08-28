@@ -1,28 +1,15 @@
-.table-container {
-  padding: 50px;
-
-  .table-operations {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    margin-bottom: 16px;
-
-    .expenses-count {
-      margin-left: auto;
-      min-width: 100px;
-      padding-left: 10px;
-    }
+.loader {
+  nz-spin {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform: -webkit-translate(-50%, -50%);
+    transform: -moz-translate(-50%, -50%);
+    transform: -ms-translate(-50%, -50%);
   }
+}
 
-  .table-operations > button {
-    margin-right: 8px;
-  }
-
-  .actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 143px;
-    gap: 8px;
-  }
+.error {
+  padding: 12px;
 }

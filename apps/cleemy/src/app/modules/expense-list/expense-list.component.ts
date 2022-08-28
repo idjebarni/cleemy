@@ -1,7 +1,6 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { ExpenseService } from './store/expense.service';
 import { Expense } from './models/expense.model';
-import { TableColumn } from './models/table-column.model';
 import { ExpenseFormModalComponent } from './components/expense-form/expense-form-modal.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -9,68 +8,42 @@ import { Select, Store } from '@ngxs/store';
 import { ExpenseActions } from './store/expense.actions';
 import { ExpenseState } from './store/expense.state';
 import { NzModalRef } from 'ng-zorro-antd/modal/modal-ref';
+import { TableFilters } from './models/table-filters.model';
 
 @Component({
   selector: 'cleemy-expense-list',
   templateUrl: './expense-list.component.html',
   styleUrls: ['./expense-list.component.scss'],
 })
-export class ExpenseListComponent implements OnDestroy {
+export class ExpenseListComponent implements OnInit, OnChanges, OnDestroy {
   @Select(ExpenseState.expenses) expenses$: Observable<any> | undefined;
   @Select(ExpenseState.expensesTotal) totalCount$: Observable<any> | undefined;
   @Select(ExpenseState.loading) loading$: Observable<any> | undefined;
+  @Select(ExpenseState.error) error$: Observable<any> | undefined;
+  @Select(ExpenseState.filters) filters$!: Observable<TableFilters>;
 
-  columns: TableColumn[] = [
-    {
-      name: 'Purchased date',
-      sortOrder: null,
-      showSort: true,
-      sortFn: (a: Expense, b: Expense) =>
-        new Date(a.purchasedOn).getTime() > new Date(b.purchasedOn).getTime() ? -1 : 1,
-    },
-    {
-      name: 'Nature',
-      sortOrder: null,
-      showSort: true,
-      sortFn: (a: Expense, b: Expense) => a.nature.localeCompare(b.nature),
-    },
-    {
-      name: 'Amount',
-      sortOrder: null,
-      showSort: true,
-      sortFn: (a: Expense, b: Expense) => a.originalAmount.amount - b.originalAmount.amount,
-    },
-    {
-      name: 'Comment',
-      sortOrder: null,
-      showSort: true,
-      sortFn: (a: Expense, b: Expense) => a.comment.localeCompare(b.comment),
-    },
-    {
-      name: 'Created date',
-      sortOrder: null,
-      showSort: true,
-      sortFn: (a: Expense, b: Expense) => (new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime() ? -1 : 1),
-    },
-    {
-      name: 'Last modification date',
-      sortOrder: null,
-      showSort: true,
-      sortFn: (a: Expense, b: Expense) =>
-        new Date(a.lastModifiedAt).getTime() > new Date(b.lastModifiedAt).getTime() ? -1 : 1,
-    },
-    {
-      name: 'Action',
-      sortOrder: null,
-      sortFn: null,
-      showSort: false,
-    },
-  ];
   destroy$ = new Subject();
   convertedAmount: number | undefined;
 
-  constructor(private expenseService: ExpenseService, private modal: NzModalService, private store: Store) {
-    this.store.dispatch(new ExpenseActions.LoadExpenses());
+  filters: TableFilters = {
+    _page: 1,
+    _limit: 5,
+  };
+
+  constructor(private expenseService: ExpenseService, private modal: NzModalService, private store: Store) {}
+
+  ngOnInit() {
+    this.filters$?.pipe(takeUntil(this.destroy$)).subscribe((filters: TableFilters) => {
+      this.filters = filters;
+    });
+    console.log(this.filters);
+    this.loadExpenses(this.filters);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['filters']) {
+      console.log(changes);
+    }
   }
 
   ngOnDestroy() {
@@ -78,32 +51,43 @@ export class ExpenseListComponent implements OnDestroy {
     this.destroy$.complete();
   }
 
-  trackByName(_: number, item: TableColumn): string {
-    return item.name;
-  }
-
-  resetSortAndFilters(): void {
-    this.columns.forEach((item) => {
-      item.sortOrder = null;
-    });
+  loadExpenses(filters: TableFilters) {
+    this.store.dispatch(new ExpenseActions.LoadExpenses(filters));
   }
 
   addExpense() {
     const modalRef = this.openExpenseModal();
     modalRef.componentInstance?.submitExpense.pipe(takeUntil(this.destroy$)).subscribe((expense: Expense) => {
+      console.log(this.filters);
       this.store.dispatch(new ExpenseActions.CreateExpense(expense));
     });
   }
 
-  deleteRow(id: string): void {
+  deleteExpense(id: string): void {
+    console.log(this.filters);
     this.store.dispatch(new ExpenseActions.DeleteExpense(id));
   }
 
-  updateRow(expense: Partial<Expense>): void {
+  updateExpense(expense: Partial<Expense>): void {
     const modalRef = this.openExpenseModal(expense);
     modalRef.componentInstance?.submitExpense.pipe(takeUntil(this.destroy$)).subscribe((expense: Expense) => {
       this.store.dispatch(new ExpenseActions.UpdateExpense(expense));
     });
+  }
+
+  filterUpdate(params: { type: string; value: number }) {
+    switch (params?.type) {
+      case 'pageSize':
+        this.store.dispatch(new ExpenseActions.LoadExpenses({ ...this.filters, _limit: params.value }));
+        break;
+
+      case 'pageIndex':
+        this.store.dispatch(new ExpenseActions.LoadExpenses({ ...this.filters, _page: params.value }));
+        break;
+
+      default:
+        break;
+    }
   }
 
   private openExpenseModal(editedExpense?: Partial<Expense>): NzModalRef {
@@ -125,7 +109,9 @@ export class ExpenseListComponent implements OnDestroy {
             modalRef.componentInstance
               ?.submitForm()
               .then((success) => {
-                if (success) modalRef.close();
+                if (success) {
+                  modalRef.close();
+                }
               })
               .catch((error) => error);
           },
