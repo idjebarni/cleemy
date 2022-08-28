@@ -21,29 +21,25 @@ import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzPipesModule } from 'ng-zorro-antd/pipes';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
+const antModules = [
+  NzInputNumberModule,
+  NzCollapseModule,
+  NzPipesModule,
+  NzToolTipModule,
+  NzInputModule,
+  NzSelectModule,
+  NzModalModule,
+  NzPopconfirmModule,
+  NzIconModule,
+  NzDatePickerModule,
+  NzTableModule,
+  NzButtonModule,
+  NzFormModule,
+];
+
 @NgModule({
   declarations: [ExpenseListComponent, ExpenseFormModalComponent],
-  imports: [
-    CommonModule,
-    ExpenseListRoutingModule,
-    HttpClientModule,
-    SharedModule,
-    NzTableModule,
-    NzButtonModule,
-    NzFormModule,
-    ReactiveFormsModule,
-    NzInputModule,
-    NzSelectModule,
-    NzModalModule,
-    NzPopconfirmModule,
-    NzIconModule,
-    NzDatePickerModule,
-    FormsModule,
-    NzInputNumberModule,
-    NzCollapseModule,
-    NzPipesModule,
-    NzToolTipModule,
-  ],
+  imports: [CommonModule, ExpenseListRoutingModule, HttpClientModule, SharedModule, ReactiveFormsModule, ...antModules],
   providers: [ExpenseService],
 })
 export class ExpenseListModule {}

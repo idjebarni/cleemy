@@ -90,7 +90,7 @@ export class ExpenseListComponent implements OnDestroy {
 
   addExpense() {
     const modalRef = this.openExpenseModal();
-    modalRef.componentInstance?.onConfirm.pipe(takeUntil(this.destroy$)).subscribe((expense: Expense) => {
+    modalRef.componentInstance?.submitExpense.pipe(takeUntil(this.destroy$)).subscribe((expense: Expense) => {
       this.store.dispatch(new ExpenseActions.CreateExpense(expense));
     });
   }
@@ -101,7 +101,7 @@ export class ExpenseListComponent implements OnDestroy {
 
   updateRow(expense: Partial<Expense>): void {
     const modalRef = this.openExpenseModal(expense);
-    modalRef.componentInstance?.onConfirm.pipe(takeUntil(this.destroy$)).subscribe((expense: Expense) => {
+    modalRef.componentInstance?.submitExpense.pipe(takeUntil(this.destroy$)).subscribe((expense: Expense) => {
       this.store.dispatch(new ExpenseActions.UpdateExpense(expense));
     });
   }

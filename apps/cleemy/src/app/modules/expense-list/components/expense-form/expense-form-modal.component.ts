@@ -58,7 +58,7 @@ export class ExpenseFormModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const originalCurrency: any = this.validateForm.get('originalCurrency')?.value;
+    const originalCurrency: string = this.validateForm.get('originalCurrency')?.value;
     this.expenseService
       .convertExpense({
         amount: originalAmount,
@@ -66,7 +66,7 @@ export class ExpenseFormModalComponent implements OnInit, OnDestroy {
         to: 'EUR',
       })
       .pipe(takeUntil(this.destroy$), debounceTime(50000), distinctUntilChanged())
-      .subscribe((convertedAmount) => {
+      .subscribe((convertedAmount: any) => {
         this.validateForm.get('convertedAmount')?.setValue(Math.round(convertedAmount.result));
       });
   }

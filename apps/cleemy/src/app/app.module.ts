@@ -20,6 +20,7 @@ import { NgxsRouterPluginModule } from '@ngxs/router-plugin';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 
 registerLocaleData(en);
+const antModules = [NzPageHeaderModule];
 
 @NgModule({
   declarations: [AppComponent],
@@ -30,7 +31,6 @@ registerLocaleData(en);
     HttpClientModule,
     BrowserAnimationsModule,
     RouterModule,
-    NzPageHeaderModule,
     NgxsModule.forRoot([ExpenseState], {
       developmentMode: !environment.production,
     }),
@@ -38,6 +38,7 @@ registerLocaleData(en);
     NgxsRouterPluginModule.forRoot(),
     NgxsActionsExecutingModule.forRoot(),
     NgxsSelectSnapshotModule.forRoot(),
+    ...antModules,
   ],
   providers: [{ provide: NZ_I18N, useValue: en_US }],
   bootstrap: [AppComponent],
