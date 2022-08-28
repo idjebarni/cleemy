@@ -57,7 +57,7 @@ export class ExpenseFormModalComponent implements OnInit, OnDestroy, AfterViewCh
     this.destroy$.complete();
   }
 
-  convertAmount(originalAmount: string | number | undefined) {
+  handleConversionProcess(originalAmount: string | number | undefined) {
     this.validateForm.controls['convertedAmount'].disable();
     if (originalAmount?.toString().length === 0) {
       this.validateForm.controls['convertedAmount'].enable();

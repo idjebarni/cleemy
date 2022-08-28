@@ -2,7 +2,7 @@
                       (deleteExpense)='deleteExpense($event)'
                       (filterUpdate)='filterUpdate($event)'
                       (updateExpense)='updateExpense($event)'
-                      *ngIf='!(error$ | async) && !!(expenses$ | async); else states'
+                      *ngIf='(error$ | async) === null && (expenses$ | async); else states'
                       [expenses]='(expenses$ | async)'
                       [filters]='filters'
                       [loading]='(loading$ | async)'

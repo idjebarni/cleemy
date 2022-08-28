@@ -34,3 +34,13 @@
     padding: 24px;
   }
 }
+
+.empty-state {
+  .title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+  }
+}

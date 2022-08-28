@@ -3,12 +3,13 @@
     <button (click)='onAddExpense()' nz-button nzType='primary'>Create expense</button>
     <button (click)='resetSortAndFilters()' nz-button nzType='primary'>Clear sorters</button>
     <div *ngIf='totalCount' class='expenses-count'>
-      <span>{{ totalCount }} expenses</span>
+      <span>Total: {{ totalCount }} expenses</span>
     </div>
   </div>
   <nz-table #filterTable [nzData]='expenses'
             [nzLoading]='loading'
-            [nzPageSize]='5'
+            [nzNoResult]='emptyState'
+            [nzPageSize]='filters._limit'
             [nzShowPagination]='false' [nzTotal]='totalCount' nzTableLayout='fixed'>
     <thead>
     <tr>
@@ -59,13 +60,34 @@
 
   <div class='pagination'>
     <nz-pagination
+      (nzPageIndexChange)='onFilterUpdate({type: tableFilters.PAGE_INDEX, value: $event})'
+      (nzPageSizeChange)='onFilterUpdate({type: tableFilters.PAGE_SIZE, value: $event})'
+      [nzPageIndex]='filters._page'
+      [nzPageSizeOptions]='[5, 10, 15, 20]'
+      [nzPageSize]='filters._limit'
       [nzSize]="'default'"
       [nzTotal]='totalCount'
-      [nzPageIndex]='filters._page'
-      [nzPageSize]='filters._limit'
-      (nzPageIndexChange)='onFilterUpdate({type: "pageIndex", value: $event})'
-      (nzPageSizeChange)='onFilterUpdate({type: "pageSize", value: $event})'
+      nzShowSizeChanger
     >
     </nz-pagination>
   </div>
 </div>
+
+<ng-template #emptyState>
+  <nz-empty
+    [nzNotFoundContent]='contentTpl'
+    [nzNotFoundFooter]='footerTpl'
+    class='empty-state'
+    nzNotFoundImage='https://cdn-icons-png.flaticon.com/512/2171/2171476.png'
+  >
+    <ng-template #contentTpl>
+        <span class='title'>
+          You've not added any expenses yet
+      <small>Would you like to add one now?</small>
+        </span>
+    </ng-template>
+    <ng-template #footerTpl>
+      <button (click)='onAddExpense()' nz-button nzType='primary'>Create expense</button>
+    </ng-template>
+  </nz-empty>
+</ng-template>

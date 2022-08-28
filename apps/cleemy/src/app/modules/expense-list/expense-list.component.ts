@@ -1,4 +1,4 @@
-import { Component, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ExpenseService } from './store/expense.service';
 import { Expense } from './models/expense.model';
 import { ExpenseFormModalComponent } from './components/expense-form/expense-form-modal.component';
@@ -9,17 +9,19 @@ import { ExpenseActions } from './store/expense.actions';
 import { ExpenseState } from './store/expense.state';
 import { NzModalRef } from 'ng-zorro-antd/modal/modal-ref';
 import { TableFilters } from './models/table-filters.model';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { TableFilterType } from './models/table-filter-type.enum';
 
 @Component({
   selector: 'cleemy-expense-list',
   templateUrl: './expense-list.component.html',
   styleUrls: ['./expense-list.component.scss'],
 })
-export class ExpenseListComponent implements OnInit, OnChanges, OnDestroy {
-  @Select(ExpenseState.expenses) expenses$: Observable<any> | undefined;
-  @Select(ExpenseState.expensesTotal) totalCount$: Observable<any> | undefined;
-  @Select(ExpenseState.loading) loading$: Observable<any> | undefined;
-  @Select(ExpenseState.error) error$: Observable<any> | undefined;
+export class ExpenseListComponent implements OnInit, OnDestroy {
+  @Select(ExpenseState.expenses) expenses$!: Observable<any>;
+  @Select(ExpenseState.expensesTotal) totalCount$!: Observable<any>;
+  @Select(ExpenseState.loading) loading$!: Observable<any>;
+  @Select(ExpenseState.error) error$!: Observable<any>;
   @Select(ExpenseState.filters) filters$!: Observable<TableFilters>;
 
   destroy$ = new Subject();
@@ -30,20 +32,19 @@ export class ExpenseListComponent implements OnInit, OnChanges, OnDestroy {
     _limit: 5,
   };
 
-  constructor(private expenseService: ExpenseService, private modal: NzModalService, private store: Store) {}
+  constructor(
+    private expenseService: ExpenseService,
+    private modal: NzModalService,
+    private store: Store,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+  ) {}
 
   ngOnInit() {
-    this.filters$?.pipe(takeUntil(this.destroy$)).subscribe((filters: TableFilters) => {
-      this.filters = filters;
-    });
-    console.log(this.filters);
+    this.initFilters();
+    this.buildUrlParams({ ...this.filters });
+    this.handleUrlParams();
     this.loadExpenses(this.filters);
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['filters']) {
-      console.log(changes);
-    }
   }
 
   ngOnDestroy() {
@@ -58,13 +59,11 @@ export class ExpenseListComponent implements OnInit, OnChanges, OnDestroy {
   addExpense() {
     const modalRef = this.openExpenseModal();
     modalRef.componentInstance?.submitExpense.pipe(takeUntil(this.destroy$)).subscribe((expense: Expense) => {
-      console.log(this.filters);
       this.store.dispatch(new ExpenseActions.CreateExpense(expense));
     });
   }
 
   deleteExpense(id: string): void {
-    console.log(this.filters);
     this.store.dispatch(new ExpenseActions.DeleteExpense(id));
   }
 
@@ -77,17 +76,47 @@ export class ExpenseListComponent implements OnInit, OnChanges, OnDestroy {
 
   filterUpdate(params: { type: string; value: number }) {
     switch (params?.type) {
-      case 'pageSize':
+      case TableFilterType.PAGE_SIZE:
         this.store.dispatch(new ExpenseActions.LoadExpenses({ ...this.filters, _limit: params.value }));
+        this.buildUrlParams({ ...this.filters, _limit: params.value });
         break;
 
-      case 'pageIndex':
+      case TableFilterType.PAGE_INDEX:
         this.store.dispatch(new ExpenseActions.LoadExpenses({ ...this.filters, _page: params.value }));
+        this.buildUrlParams({ ...this.filters, _page: params.value });
         break;
 
       default:
         break;
     }
+  }
+
+  private buildUrlParams(filters: TableFilters) {
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: {
+        ...filters,
+      },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  private initFilters() {
+    this.filters$?.pipe(takeUntil(this.destroy$)).subscribe((filters: TableFilters) => {
+      this.filters = filters;
+    });
+  }
+
+  private handleUrlParams() {
+    this.activatedRoute.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params: Params) => {
+      if (params['_page']) {
+        this.filters._page = params['_page'];
+      }
+
+      if (params['_limit']) {
+        this.filters._limit = params['_limit'];
+      }
+    });
   }
 
   private openExpenseModal(editedExpense?: Partial<Expense>): NzModalRef {

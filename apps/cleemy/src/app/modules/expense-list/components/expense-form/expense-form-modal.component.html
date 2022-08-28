@@ -53,7 +53,7 @@
         </nz-form-control>
       </nz-form-item>
       <div class='button-container'>
-        <button (click)='convertAmount(originalAmount?.displayValue); $event.preventDefault()'
+        <button (click)='handleConversionProcess(originalAmount?.displayValue); $event.preventDefault()'
                 nz-button [nzLoading]='conversionLoading'>Convert
         </button>
       </div>
@@ -72,7 +72,7 @@
           [nzTooltipTitle]="(amountInput.disabled$ | async) ? 'This amount is converted automatically' : null "
           nz-tooltip
           nzTooltipPlacement='bottom'>
-          <nz-input-number #amountInput [nzDisabled]='!!editedExpense?.convertedAmount' [nzMin]='1'
+          <nz-input-number #amountInput [nzDisabled]='!editedExpense?.convertedAmount' [nzMin]='1'
                            [nzStep]='1'
                            formControlName='convertedAmount'></nz-input-number>
         </div>

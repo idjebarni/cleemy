@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Expense } from '../../models/expense.model';
 import { TableColumn } from '../../models/table-column.model';
 import { TableFilters } from '../../models/table-filters.model';
+import { TableFilterType } from '../../models/table-filter-type.enum';
 
 @Component({
   selector: 'cleemy-expense-table',
@@ -9,10 +10,10 @@ import { TableFilters } from '../../models/table-filters.model';
   styleUrls: ['./expense-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ExpenseTableComponent implements OnInit {
+export class ExpenseTableComponent {
   @Input() expenses: Expense[] = [];
-  @Input() loading: boolean = false;
-  @Input() totalCount: number = 0;
+  @Input() loading = false;
+  @Input() totalCount = 0;
   @Input() filters: TableFilters = { _page: 1, _limit: 5 };
 
   @Output() addExpense: EventEmitter<void> = new EventEmitter<void>();
@@ -22,6 +23,8 @@ export class ExpenseTableComponent implements OnInit {
     type: string;
     value: number;
   }>();
+
+  tableFilters = TableFilterType;
 
   columns: TableColumn[] = [
     {
@@ -72,8 +75,6 @@ export class ExpenseTableComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {}
-
   trackByName(index: number, item: TableColumn): string {
     return item.name;
   }
@@ -96,7 +97,7 @@ export class ExpenseTableComponent implements OnInit {
     this.deleteExpense.emit(id);
   }
 
-  onFilterUpdate(params: { type: string; value: number }) {
+  onFilterUpdate(params: { type: TableFilterType; value: number }) {
     this.filterUpdate.emit(params);
   }
 }
