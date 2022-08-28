@@ -7,15 +7,13 @@
   </nz-form-item>
   <nz-form-item>
     <nz-form-label
-      [nzSm]='6'
-      [nzXs]='24'
       nzFor='nature'
       nzRequired
       nzTooltipTitle='What was the purpose of the expense'
     >
       <span>Nature</span>
     </nz-form-label>
-    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please fill the purpose of the expense'>
+    <nz-form-control nzErrorTip='Please fill the purpose of the expense'>
       <input formControlName='nature' id='nature' maxlength='120' nz-input placeholder='Restaurant, parking...' />
     </nz-form-control>
   </nz-form-item>
@@ -30,17 +28,19 @@
     >
       <span>Comment</span>
     </nz-form-label>
-    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please add a comment to explain your expense'>
+    <nz-form-control nzErrorTip='Please add a comment to explain your expense'>
       <textarea formControlName='comment' id='comment' maxlength='600' nz-input></textarea>
     </nz-form-control>
   </nz-form-item>
   <nz-collapse nzAccordion>
-    <nz-collapse-panel [nzActive]='false' [nzHeader]="'You used another currency?'">
+    <nz-collapse-panel
+      [nzActive]='true'
+      [nzHeader]="'You used another currency?'">
       <nz-form-item>
-        <nz-form-label [nzSm]='14' [nzXs]='24' nzFor='originalAmount'>
+        <nz-form-label nzFor='originalAmount'>
           Expense amount
         </nz-form-label>
-        <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please insert your expense'>
+        <nz-form-control nzErrorTip='Please insert your expense'>
           <nz-input-group [nzAddOnBefore]='originalCurrencyTemplate'>
             <ng-template #originalCurrencyTemplate>
               <nz-select formControlName='originalCurrency' nzShowSearch>
@@ -53,20 +53,29 @@
         </nz-form-control>
       </nz-form-item>
       <div class='button-container'>
-        <button (click)='convertAmount(originalAmount?.displayValue)' nz-button>Convert</button>
+        <button (click)='convertAmount(originalAmount?.displayValue); $event.preventDefault()'
+                nz-button [nzLoading]='conversionLoading'>Convert
+        </button>
       </div>
     </nz-collapse-panel>
   </nz-collapse>
   <nz-form-item>
-    <nz-form-label [nzSm]='14' [nzXs]='24' nzFor='convertedAmount' nzRequired>Expense amount</nz-form-label>
-    <nz-form-control [nzSm]='14' [nzXs]='24' nzErrorTip='Please insert your converted expense'>
+    <nz-form-label nzFor='convertedAmount' nzRequired>Expense amount</nz-form-label>
+    <nz-form-control nzErrorTip='Please insert your expense amount'>
       <nz-input-group [nzAddOnBefore]='conversionCurrencyTemplate'>
         <ng-template #conversionCurrencyTemplate>
           <nz-select [nzDisabled]='true' formControlName='conversionCurrency'>
             <nz-option [nzLabel]="'EUR'" [nzValue]="'EUR'"></nz-option>
           </nz-select>
         </ng-template>
-        <nz-input-number [nzMin]='1' [nzStep]='1' formControlName='convertedAmount'></nz-input-number>
+        <div
+          [nzTooltipTitle]="(amountInput.disabled$ | async) ? 'This amount is converted automatically' : null "
+          nz-tooltip
+          nzTooltipPlacement='bottom'>
+          <nz-input-number #amountInput [nzDisabled]='!!editedExpense?.convertedAmount' [nzMin]='1'
+                           [nzStep]='1'
+                           formControlName='convertedAmount'></nz-input-number>
+        </div>
       </nz-input-group>
     </nz-form-control>
   </nz-form-item>

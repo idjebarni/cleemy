@@ -34,3 +34,30 @@ body {
 .ant-collapse-item {
   margin-bottom: 31px;
 }
+
+
+.toast {
+
+  .ant-notification-notice-message {
+    font-weight: 700;
+  }
+
+  &.success {
+    background: green;
+  }
+
+  &.error {
+    background-color: #2a1215;
+    border: 1px solid #58181c;
+  }
+}
+
+/*
+.ant-tooltip-inner {
+  width: 258px;
+}*/
+
+
+.ant-alert-message {
+  font-weight: 700;
+}

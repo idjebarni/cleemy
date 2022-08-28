@@ -15,12 +15,13 @@
   padding: 90px;
 }
 
-#comment {
-  width: 100%;
-}
-
 .button-container {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+
+  button {
+    width: 103.02px;
+  }
 }
+

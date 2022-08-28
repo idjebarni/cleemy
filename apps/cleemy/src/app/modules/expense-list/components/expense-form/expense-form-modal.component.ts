@@ -1,24 +1,25 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import Currencies from '../../../shared/utils/currencies.json';
 import { Expense } from '../../models/expense.model';
 import { ExpenseService } from '../../store/expense.service';
-import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'cleemy-expense-form-modal',
   templateUrl: './expense-form-modal.component.html',
   styleUrls: ['./expense-form-modal.component.scss'],
 })
-export class ExpenseFormModalComponent implements OnInit, OnDestroy {
+export class ExpenseFormModalComponent implements OnInit, OnDestroy, AfterViewChecked {
   @Output() submitExpense: EventEmitter<Partial<Expense>> = new EventEmitter<Partial<Expense>>();
 
   validateForm!: UntypedFormGroup;
   currencies: string[] = Currencies;
   editedExpense: Partial<Expense> | undefined;
   private destroy$ = new Subject();
+  conversionLoading = false;
 
-  constructor(private fb: UntypedFormBuilder, private expenseService: ExpenseService) {}
+  constructor(private fb: UntypedFormBuilder, private expenseService: ExpenseService, private cdr: ChangeDetectorRef) {}
 
   submitForm(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
@@ -38,12 +39,17 @@ export class ExpenseFormModalComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngAfterViewChecked() {
+    this.cdr.detectChanges();
+  }
+
   init(editedExpense: Partial<Expense>) {
     this.editedExpense = editedExpense;
   }
 
   ngOnInit(): void {
     this.buildForm();
+    this.refreshAmountInput();
   }
 
   ngOnDestroy() {
@@ -52,11 +58,14 @@ export class ExpenseFormModalComponent implements OnInit, OnDestroy {
   }
 
   convertAmount(originalAmount: string | number | undefined) {
-    console.log(originalAmount);
+    this.validateForm.controls['convertedAmount'].disable();
     if (originalAmount?.toString().length === 0) {
+      this.validateForm.controls['convertedAmount'].enable();
       this.validateForm.get('convertedAmount')?.setValue(0);
       return;
     }
+
+    this.conversionLoading = true;
 
     const originalCurrency: string = this.validateForm.get('originalCurrency')?.value;
     this.expenseService
@@ -65,10 +74,21 @@ export class ExpenseFormModalComponent implements OnInit, OnDestroy {
         from: originalCurrency,
         to: 'EUR',
       })
-      .pipe(takeUntil(this.destroy$), debounceTime(50000), distinctUntilChanged())
-      .subscribe((convertedAmount: any) => {
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((convertedAmount) => {
         this.validateForm.get('convertedAmount')?.setValue(Math.round(convertedAmount.result));
+        this.conversionLoading = false;
       });
+  }
+
+  private refreshAmountInput() {
+    this.validateForm.get('originalAmount')?.valueChanges.subscribe((originalAmount) => {
+      if (originalAmount?.toString().length === 0) {
+        this.validateForm.controls['convertedAmount'].enable();
+        this.validateForm.get('convertedAmount')?.setValue(0);
+        return;
+      }
+    });
   }
 
   private buildForm() {
@@ -84,18 +104,19 @@ export class ExpenseFormModalComponent implements OnInit, OnDestroy {
   }
 
   private buildFormattedExpense() {
+    const formValues = this.validateForm.getRawValue();
     return {
       ...(this.editedExpense ?? null),
-      purchasedOn: this.validateForm.value.purchasedOn,
-      nature: this.validateForm.value.nature,
-      comment: this.validateForm.value.comment,
+      purchasedOn: formValues.purchasedOn,
+      nature: formValues.nature,
+      comment: formValues.comment,
       originalAmount: {
-        amount: this.validateForm.value.originalAmount,
-        currency: this.validateForm.value.originalCurrency,
+        amount: formValues.originalAmount,
+        currency: formValues.originalCurrency,
       },
       convertedAmount: {
-        amount: this.validateForm.value.convertedAmount,
-        currency: this.validateForm.value.conversionCurrency,
+        amount: formValues.convertedAmount,
+        currency: formValues.conversionCurrency,
       },
     };
   }
