@@ -1,16 +1,11 @@
 import { Expense } from '../models/expense.model';
+import { TableFilters } from '../models/table-filters.model';
 
 export namespace ExpenseActions {
   export class LoadExpenses {
     public static readonly type = '[Expenses] LOAD_EXPENSES';
 
-    constructor() {}
-  }
-
-  export class ConvertExpense {
-    public static readonly type = '[Expenses] CONVERT_EXPENSE';
-
-    constructor(public id: string) {}
+    constructor(public filters: TableFilters) {}
   }
 
   export class CreateExpense {
@@ -23,6 +18,12 @@ export namespace ExpenseActions {
     public static readonly type = '[Expenses] UPDATE_EXPENSE';
 
     constructor(public expense: Partial<Expense>) {}
+  }
+
+  export class UpdateTotalCount {
+    public static readonly type = '[Expenses] UPDATE_TOTAL_COUNT';
+
+    constructor(public total: number) {}
   }
 
   export class DeleteExpense {
