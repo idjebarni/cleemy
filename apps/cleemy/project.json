@@ -26,7 +26,8 @@
         ],
         "styles": [
           "./node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
-          "apps/cleemy/src/styles.scss"
+          "apps/cleemy/src/styles.scss",
+          "apps/cleemy/src/app/styles/custom-ant-design.scss"
         ],
         "scripts": []
       },

@@ -18,7 +18,7 @@ export class CleemyInterceptor implements HttpInterceptor {
         }
         return event;
       }),
-      catchError((error: any) => {
+      catchError((error) => {
         return throwError(error);
       }),
     );

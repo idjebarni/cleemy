@@ -1,0 +1,40 @@
+.ant-table-wrapper {
+  min-width: 950px;
+}
+
+.ant-page-header-heading-title {
+  cursor: pointer;
+}
+
+.ant-input-group-addon {
+  width: 50%;
+}
+
+.ant-input-number {
+  width: 100%;
+}
+
+.ant-collapse-item {
+  margin-bottom: 31px;
+}
+
+
+.toast {
+
+  .ant-notification-notice-message {
+    font-weight: 700;
+  }
+
+  &.success {
+    background: green;
+  }
+
+  &.error {
+    background-color: #2a1215;
+    border: 1px solid #58181c;
+  }
+}
+
+.ant-alert-message {
+  font-weight: 700;
+}
