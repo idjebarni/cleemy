@@ -25,6 +25,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { ExpenseTableComponent } from './components/expense-table/expense-table.component';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
 
 const antModules = [
   NzInputNumberModule,
@@ -43,19 +44,13 @@ const antModules = [
   NzDividerModule,
   NzSpinModule,
   NzAlertModule,
+  NzPaginationModule,
+  NzEmptyModule,
 ];
 
 @NgModule({
   declarations: [ExpenseListComponent, ExpenseFormModalComponent, ExpenseTableComponent],
-  imports: [
-    CommonModule,
-    ExpenseListRoutingModule,
-    HttpClientModule,
-    SharedModule,
-    ReactiveFormsModule,
-    ...antModules,
-    NzPaginationModule,
-  ],
+  imports: [CommonModule, ExpenseListRoutingModule, HttpClientModule, SharedModule, ReactiveFormsModule, ...antModules],
   providers: [ExpenseService],
 })
 export class ExpenseListModule {}

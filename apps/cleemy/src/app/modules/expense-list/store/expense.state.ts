@@ -34,7 +34,7 @@ export class ExpenseState {
   }
 
   @Selector()
-  public static loading(state: ExpenseModel) {
+  public static loading(state: ExpenseModel): boolean {
     return state.expenses.loading;
   }
 
@@ -54,20 +54,17 @@ export class ExpenseState {
   }
 
   @Selector()
-  public static expensesTotal(state: ExpenseModel): number | null | undefined {
-    return state.expenses.total;
+  public static expensesTotal(state: ExpenseModel): number {
+    return state?.expenses?.total as number;
   }
 
   @Action(ExpenseActions.LoadExpenses, { cancelUncompleted: true })
-  public loadExpenses(
-    { dispatch, setState, getState }: StateContext<ExpenseModel>,
-    { filters }: ExpenseActions.LoadExpenses,
-  ) {
+  public loadExpenses({ setState, getState }: StateContext<ExpenseModel>, { filters }: ExpenseActions.LoadExpenses) {
     setState(patch({ expenses: setLoading(true) }));
     return this.expenseService.getExpenses(filters).pipe(
       tap((expenses: Expense[]) => {
         setState(patch({ filters: filters }));
-        setState(patch({ expenses: setResource(expenses, getState().expenses?.total) }));
+        setState(patch({ expenses: setResource(expenses, getState().expenses.total as number) }));
       }),
       catchError((error) => {
         setState(patch({ expenses: setError(error) }));
@@ -83,8 +80,8 @@ export class ExpenseState {
   ) {
     return this.expenseService.deleteExpense(id).pipe(
       tap(() => {
-        this.notification.blank('Good job!', 'Your expense was created successfully!', {
-          nzPlacement: 'bottom',
+        this.notification.blank('Good job!', 'Your expense was deleted successfully!', {
+          nzPlacement: 'top',
           nzClass: 'toast success',
         });
         setState(patch({ filters: getState().filters }));
@@ -92,7 +89,7 @@ export class ExpenseState {
       }),
       catchError((error) => {
         this.notification.blank('Something went wrong', 'If the problem persists try refreshing.', {
-          nzPlacement: 'bottom',
+          nzPlacement: 'top',
           nzClass: 'toast error',
         });
         return error;
@@ -108,7 +105,7 @@ export class ExpenseState {
     return this.expenseService.createExpense(expense).pipe(
       tap(() => {
         this.notification.blank('Good job!', 'Your expense was created successfully!', {
-          nzPlacement: 'bottom',
+          nzPlacement: 'top',
           nzClass: 'toast success',
         });
         setState(patch({ filters: getState().filters }));
@@ -116,7 +113,7 @@ export class ExpenseState {
       }),
       catchError((error) => {
         this.notification.blank('Something went wrong', error, {
-          nzPlacement: 'bottom',
+          nzPlacement: 'top',
           nzClass: 'toast error',
         });
         return error;
@@ -131,8 +128,8 @@ export class ExpenseState {
   ) {
     return this.expenseService.updateExpense(expense).pipe(
       tap(() => {
-        this.notification.blank('Good job!', 'Your expense was created successfully!', {
-          nzPlacement: 'bottom',
+        this.notification.blank('Good job!', 'Your expense was updated successfully!', {
+          nzPlacement: 'top',
           nzClass: 'toast success',
         });
         setState(patch({ filters: getState().filters }));
@@ -140,9 +137,8 @@ export class ExpenseState {
       }),
       catchError((error) => {
         this.notification.blank('Oops!', 'It looks like something went wrong.', {
-          nzPlacement: 'bottom',
+          nzPlacement: 'top',
           nzClass: 'toast error',
-          nzDuration: 50000,
         });
         return error;
       }),
