@@ -3,7 +3,7 @@
     <button (click)='onAddExpense()' nz-button nzType='primary'>Create expense</button>
     <button (click)='resetSortAndFilters()' nz-button nzType='default'>Clear sorters</button>
     <div *ngIf='totalCount' class='expenses-count'>
-      <span>Total: {{ totalCount }} expenses</span>
+      <span>Total: {{ totalCount }} expense{{ totalCount > 1 ? 's' : null}}</span>
     </div>
   </div>
   <nz-table #filterTable [nzData]='expenses'
