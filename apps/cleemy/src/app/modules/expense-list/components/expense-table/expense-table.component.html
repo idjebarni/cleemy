@@ -40,7 +40,7 @@
         <span [nzTooltipTitle]='data.comment.length > 150 ? data.comment : null'
               nz-tooltip
               nzTooltipPlacement='bottom'>
-          {{ data.comment | nzEllipsis: 150 }}
+          {{ data.comment | ellipsis: 80 }}
         </span>
       </td>
       <td>{{ data.createdAt | date: 'MMM d, h:mm a' }}</td>
