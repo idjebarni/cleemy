@@ -28,13 +28,13 @@
       <td>{{ data.purchasedOn | date: 'MMM d, h:mm a' }}</td>
       <td>{{ data.nature }}</td>
       <td>
-        <span
-          [nzTooltipTitle]="data.originalAmount.amount && data.originalAmount.currency !== 'EUR' ?
+        {{ data.convertedAmount.amount | currency: data.convertedAmount.currency : 'symbol' : '1.0-0' }}
+        <span *ngIf='data.originalAmount.amount' [nzTooltipTitle]="data.originalAmount.amount && data.originalAmount.currency !== 'EUR' ?
         'Original amount: ' + (data.originalAmount.amount | currency: data.originalAmount.currency : 'symbol' : '1.0-0') : null"
-          nz-tooltip
-          nzTooltipPlacement='bottom'>
-          {{ data.convertedAmount.amount | currency: data.convertedAmount.currency : 'symbol' : '1.0-0' }}
-        </span>
+              nz-icon nz-tooltip
+              nzTheme='outline'
+              nzTooltipPlacement='bottom'
+              nzType='info-circle'></span>
       </td>
       <td>
         <span [nzTooltipTitle]='data.comment.length > 150 ? data.comment : null'
