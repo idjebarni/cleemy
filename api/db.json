@@ -1,0 +1,52 @@
+{
+  "expenseItems": [
+    {
+      "id": "727212a0-4d73-4615-bd23-d7df6f562491",
+      "purchasedOn": "2018-12-04",
+      "nature": "Restaurant",
+      "originalAmount": {
+        "amount": 11,
+        "currency": "GBP"
+      },
+      "convertedAmount": {
+        "amount": 12,
+        "currency": "EUR"
+      },
+      "comment": "Mission de 5 jours à Londres",
+      "createdAt": "2018-12-05T14:00:34.435154Z",
+      "lastModifiedAt": "2023-02-04T19:20:46.698Z"
+    },
+    {
+      "purchasedOn": "2023-02-04T19:20:18.089Z",
+      "nature": "Restaurant",
+      "comment": "Test test",
+      "originalAmount": {
+        "amount": 131,
+        "currency": "USD"
+      },
+      "convertedAmount": {
+        "amount": 121,
+        "currency": "EUR"
+      },
+      "createdAt": "2023-02-04T19:20:40.884Z",
+      "lastModifiedAt": "2023-02-04T19:20:40.884Z",
+      "id": "bd6044de-a620-4b06-8675-3b53f77e05c2"
+    },
+    {
+      "purchasedOn": "2023-02-01T20:28:23.958Z",
+      "nature": "Test",
+      "comment": "test",
+      "originalAmount": {
+        "amount": 14,
+        "currency": "USD"
+      },
+      "convertedAmount": {
+        "amount": 13,
+        "currency": "EUR"
+      },
+      "createdAt": "2023-02-04T20:28:30.707Z",
+      "lastModifiedAt": "2023-02-04T20:28:30.707Z",
+      "id": "b7583874-3356-48b0-aa0f-c32c792ccdd0"
+    }
+  ]
+}
