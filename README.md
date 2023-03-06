@@ -1,5 +1,5 @@
 
-# Convelio - Angular Technical Test
+# Cleemy - Angular Technical Test
 
 This project was done for an interview process with Lucca. This project display an array of expenses with CRUD features & filtering/sorting.
 For this project I used [Nx](https://nx.dev/) which is a great tool to improve build time & implement a monorepo architecture.
